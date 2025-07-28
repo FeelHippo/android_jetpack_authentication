@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Authentication App</string>
+    <string name="title_login">Login to\nYour Account</string>
+    <string name="title_signup">Signup to\nYour Account</string>
+    <string name="label_full_name">Full Name</string>
+    <string name="label_email">Email Address</string>
+    <string name="label_password">Password</string>
+    <string name="label_password_repeat">Repeat Password</string>
+    <string name="label_forgot_password">Forgot Password?</string>
+    <string name="label_no_account">Don\'t have an account?</string>
+    <string name="label_have_account">I have an account</string>
+    <string name="button_login">Login</string>
+    <string name="button_signup">Signup</string>
+</resources>
