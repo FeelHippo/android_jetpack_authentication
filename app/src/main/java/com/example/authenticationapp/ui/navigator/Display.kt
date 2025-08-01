@@ -1,16 +1,8 @@
 package com.example.authenticationapp.ui.navigator
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
@@ -45,6 +37,7 @@ fun AuthenticationNavigation(
                         navigateToSignup = { backStack.add(RegistrationRoute) },
                         completeAuthentication = {
                             serviceLocator.getAuthStorage().updateToken(it)
+                            backStack.clear()
                             backStack.add(HomeRoute)
                         },
                     )
@@ -56,13 +49,20 @@ fun AuthenticationNavigation(
                         navigateToLogin = { backStack.add(LoginRoute) },
                         completeAuthentication = {
                             serviceLocator.getAuthStorage().updateToken(it)
+                            backStack.clear()
                             backStack.add(HomeRoute)
                         },
                     )
                 }
                 is PasswordRoute -> NavEntry(key) {}
                 is HomeRoute -> NavEntry(key) {
-                    HomeContent()
+                    HomeContent(
+                        revokeAuthentication = {
+                            serviceLocator.getAuthStorage().deleteToken()
+                            backStack.clear()
+                            backStack.add(LoginRoute)
+                        }
+                    )
                 }
                 else -> {
                     error("Unknown route: $key")

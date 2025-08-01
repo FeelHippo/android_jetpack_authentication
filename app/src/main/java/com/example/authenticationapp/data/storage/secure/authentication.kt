@@ -15,6 +15,13 @@ class AuthenticationStorage(preferences: SharedPreferences) {
         }
     }
 
+    fun deleteToken() {
+        token = null
+        sharedPreferences.edit {
+            remove(tokenName)
+        }
+    }
+
     init {
         val existingToken = sharedPreferences.getString(tokenName, null)
         if (existingToken != null) {

@@ -11,4 +11,5 @@
     <string name="label_have_account">I have an account</string>
     <string name="button_login">Login</string>
     <string name="button_signup">Signup</string>
+    <string name="logout">Logout</string>
 </resources>

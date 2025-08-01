@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.navigation3.ui.android)
     implementation(libs.retrofit)
     implementation(libs.converter)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

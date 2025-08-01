@@ -32,8 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.authenticationapp.R
 import com.example.authenticationapp.components.InputField
-import com.example.authenticationapp.data.network.requests.AuthenticationRequest
-import com.example.authenticationapp.data.network.responses.AuthenticationResponse
 import com.example.authenticationapp.service_locator.ServiceLocator
 import com.example.authenticationapp.ui.state.AuthenticationStateData
 import kotlinx.coroutines.launch
