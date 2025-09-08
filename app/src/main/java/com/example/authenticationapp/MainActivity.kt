@@ -14,10 +14,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val context: Context = this@MainActivity
         setContent {
             AuthenticationAppTheme {
-                AuthenticationState(context) { state ->
+                AuthenticationState() { state ->
                     AuthenticationNavigation(state)
                 }
             }

@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 // https://medium.com/@pritam.karmahapatra/retrofit-in-android-with-kotlin-9af9f66a54a8
 object RetrofitInstance {
-    private const val BASE_URL = "https://yesno.wtf/"
+    private const val BASE_URL = "https://e24a4994ed7f.ngrok-free.app/"
 
     fun getInstance(): Retrofit {
         return Retrofit
