@@ -1,7 +1,7 @@
 package com.example.authenticationapp.data.network.requests
 
 
-data class AuthenticationRequest(
+data class LoginRequest(
     var email: String,
     var password: String,
 )

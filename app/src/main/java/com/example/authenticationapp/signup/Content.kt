@@ -1,6 +1,5 @@
 package com.example.authenticationapp.signup
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,17 +31,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.authenticationapp.R
 import com.example.authenticationapp.components.InputField
-import com.example.authenticationapp.data.network.requests.RegistrationRequest
-import com.example.authenticationapp.data.network.responses.AuthenticationResponse
-import com.example.authenticationapp.service_locator.ServiceLocator
 import com.example.authenticationapp.ui.state.AuthenticationStateData
-import kotlinx.coroutines.launch
-import retrofit2.Response
 
 /**
  * Entry point for the authentication screen.
  *
- * @param serviceLocator [ServiceLocator] that contains email authentication state
  * @param uiState [AuthenticationStateData] that contains email authentication state
  * @param navigateToLogin [Unit] User action when navigation to login is requested
  * @param completeAuthentication [Unit] User action when navigation to home is requested
@@ -55,45 +47,28 @@ import retrofit2.Response
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupContent(
-    serviceLocator: ServiceLocator,
     uiState: AuthenticationStateData,
     navigateToLogin: (String?) -> Unit,
-    completeAuthentication: (String) -> Unit,
+    completeAuthentication: @Composable (String, String, String, String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
-    var fullName by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf(uiState.email ?: "") }
+    var username by rememberSaveable { mutableStateOf(uiState.username ?: "") }
+    var firstName by rememberSaveable { mutableStateOf(uiState.firstName ?: "") }
+    var lastName by rememberSaveable { mutableStateOf(uiState.lastName ?: "") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordRepeat by rememberSaveable { mutableStateOf("") }
 
     val title = stringResource(R.string.title_signup)
-    val labelFullName = stringResource(R.string.label_full_name)
+    val labelUserName = stringResource(R.string.label_user_name)
+    val labelFirstName = stringResource(R.string.label_first_name)
+    val labelLastName = stringResource(R.string.label_last_name)
     val labelEmail = stringResource(R.string.label_email)
     val labelPassword = stringResource(R.string.label_password)
     val labelPasswordRepeat = stringResource(R.string.label_password_repeat)
     val buttonSignup = stringResource(R.string.button_signup)
     val labelHaveAccount = stringResource(R.string.label_have_account)
-
-    val coroutineScope = rememberCoroutineScope()
-
-    fun onSubmitSignup() {
-        uiState.email = email
-        // https://developer.android.com/develop/ui/compose/side-effects#launchedeffect
-        coroutineScope.launch {
-//            val response: Response<AuthenticationResponse> =
-//                serviceLocator
-//                    .getAuthApiInterface()
-//                    .postRegistration(RegistrationRequest(fullName, email, password))
-            val response: Response<Any> =
-                serviceLocator
-                    .getAuthApiInterface()
-                    .getYesOrNo()
-            if (response.isSuccessful) {
-                completeAuthentication("Bearer token.from.api")
-            }
-        }
-    }
 
     Scaffold{
             innerPadding ->
@@ -117,18 +92,32 @@ fun SignupContent(
                         style = MaterialTheme.typography.titleLarge
                     )
                     InputField(
-                        labelFullName,
-                        fullName,
-                        { fullName = it },
-                        modifier,
-                        KeyboardType.Text,
-                    )
-                    InputField(
                         labelEmail,
                         email,
                         { email = it },
                         modifier,
                         KeyboardType.Email,
+                    )
+                    InputField(
+                        labelUserName,
+                        username,
+                        { username = it },
+                        modifier,
+                        KeyboardType.Text,
+                    )
+                    InputField(
+                        labelFirstName,
+                        firstName,
+                        { firstName = it },
+                        modifier,
+                        KeyboardType.Text,
+                    )
+                    InputField(
+                        labelLastName,
+                        lastName,
+                        { lastName = it },
+                        modifier,
+                        KeyboardType.Text,
                     )
                     InputField(
                         labelPassword,
@@ -161,7 +150,8 @@ fun SignupContent(
                         val maxWidth = this.maxWidth
                         Button(
                             onClick = { isClicked = true },
-                            enabled = fullName.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && password == passwordRepeat,
+                            enabled = arrayOf(email, username, firstName, lastName).all { it.isNotEmpty() }
+                                    && password == passwordRepeat,
                             modifier = modifier
                                 .width(maxWidth)
                                 .background(
@@ -174,7 +164,13 @@ fun SignupContent(
                         }
                     }
                     if (isClicked) {
-                        onSubmitSignup()
+                        completeAuthentication(
+                            email,
+                            password,
+                            username,
+                            firstName,
+                            lastName,
+                        )
                     }
                     ClickableText(
                         AnnotatedString(labelHaveAccount),

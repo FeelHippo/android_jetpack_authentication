@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,15 +31,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.authenticationapp.R
 import com.example.authenticationapp.components.InputField
-import com.example.authenticationapp.service_locator.ServiceLocator
 import com.example.authenticationapp.ui.state.AuthenticationStateData
-import kotlinx.coroutines.launch
-import retrofit2.Response
 
 /**
  * Entry point for the authentication screen.
  *
- * @param serviceLocator [ServiceLocator] that contains email authentication state
  * @param uiState [AuthenticationStateData] that contains email authentication state
  * @param navigateToSignup [Unit] User action when navigation to signup is requested
  * @param completeAuthentication [Unit] User action when navigation to home is requested
@@ -52,14 +47,13 @@ import retrofit2.Response
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginContent(
-    serviceLocator: ServiceLocator,
     uiState: AuthenticationStateData,
     navigateToSignup: () -> Unit,
-    completeAuthentication: (String) -> Unit,
+    completeAuthentication: @Composable (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
-    var email by rememberSaveable { mutableStateOf(uiState.email) }
+    var email by rememberSaveable { mutableStateOf(uiState.email ?: "") }
     var password by rememberSaveable { mutableStateOf("") }
 
     val title = stringResource(R.string.title_login)
@@ -67,26 +61,6 @@ fun LoginContent(
     val labelPassword = stringResource(R.string.label_password)
     val buttonLogin = stringResource(R.string.button_login)
     val labelNoAccount = stringResource(R.string.label_no_account)
-
-    val coroutineScope = rememberCoroutineScope()
-
-    fun onSubmitLogin() {
-        uiState.email = email
-        // https://developer.android.com/develop/ui/compose/side-effects#launchedeffect
-        coroutineScope.launch {
-//            val response: Response<AuthenticationResponse> =
-//                serviceLocator
-//                    .getAuthApiInterface()
-//                    .postAuth(AuthenticationRequest(email!!, password))
-            val response: Response<Any> =
-                serviceLocator
-                    .getAuthApiInterface()
-                    .getYesOrNo()
-            if (response.isSuccessful) {
-                completeAuthentication("Bearer token.from.api")
-            }
-        }
-    }
 
     Scaffold{
         innerPadding ->
@@ -141,7 +115,7 @@ fun LoginContent(
                         val maxWidth = this.maxWidth
                         Button(
                             onClick = { isClicked = true },
-                            enabled = email != null && email!!.isNotEmpty() && password.isNotEmpty(),
+                            enabled = email.isNotEmpty() && password.isNotEmpty(),
                             modifier = modifier
                                 .width(maxWidth)
                                 .background(
@@ -153,7 +127,7 @@ fun LoginContent(
                         }
                     }
                     if (isClicked) {
-                        onSubmitLogin()
+                        completeAuthentication(email, password)
                     }
                     ClickableText(
                         AnnotatedString(labelNoAccount),

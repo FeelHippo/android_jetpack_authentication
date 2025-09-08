@@ -12,10 +12,9 @@ import com.example.authenticationapp.ui.theme.AuthenticationAppTheme
 @Composable
 fun LoginPreview() {
     AuthenticationAppTheme { LoginContent(
-        serviceLocator = ServiceLocator(LocalContext.current),
-        uiState = AuthenticationStateData("filippo@gmail.com", "123abc", "token"),
+        uiState = AuthenticationStateData("filippo@gmail.com", "FeelHippo", "Filippo", "Miorin", "token"),
         navigateToSignup = {},
-        completeAuthentication = {},
+        completeAuthentication = {} as @Composable ((String, String) -> Unit),
         modifier = Modifier,
     ) }
 }
