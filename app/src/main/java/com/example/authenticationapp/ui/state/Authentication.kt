@@ -1,70 +1,64 @@
 package com.example.authenticationapp.ui.state
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.example.authenticationapp.service_locator.ServiceLocator
+import com.example.authenticationapp.domain.AuthenticationRepository
+import com.example.authenticationapp.domain.models.UserModel
 
 @Composable
 fun AuthenticationState(
-    navigator: @Composable (AuthenticationStateData) -> Unit,
+    navigator: @Composable (AuthenticationStateData, (UserModel) -> Unit) -> Unit,
 ) {
     val context = LocalContext.current
-    val storage = ServiceLocator(context).getAuthStorage()
-
-    var email: String? = null
-    var username: String? = null
-    var firstname: String? = null
-    var lastName: String? = null
-    // make http call to fetch openID data here and store email and fullName
+    val repository = AuthenticationRepository(context)
 
     // https://developer.android.com/develop/ui/compose/state#mapsaver
     var state by rememberSaveable(stateSaver = AuthenticationStateDataSaver) {
         mutableStateOf(
             AuthenticationStateData(
-                email,
-                username,
-                firstname,
-                lastName,
-                storage.token,
+                null,
+                repository.token,
             )
         )
     }
-    navigator(state)
+
+    if (repository.isThereAUser) {
+        val coroutineScope = rememberCoroutineScope()
+        LaunchedEffect(coroutineScope) {
+            val existingUser = repository.getUserData(repository.userUid!!)
+            if (existingUser != null) {
+                state = state.copy(existingUser)
+            }
+        }
+    }
+
+    navigator(state) { userModel -> state = state.copy(userModel) }
+
 }
 
 data class AuthenticationStateData(
-    var email: String?,
-    var username: String?,
-    var firstName: String?,
-    var lastName: String?,
+    var userModel: UserModel?,
     var token: String?
 )
 
 val AuthenticationStateDataSaver = run {
-    val emailKey = "Email"
-    val usernameKey = "UserName"
-    val firstNameKey = "FirstName"
-    val lastNameKey = "LastName"
+    val userKey = "User"
     val tokenKey = "Token"
     mapSaver(
         save = { mapOf(
-            emailKey to it.email,
-            usernameKey to it.username,
-            firstNameKey to it.firstName,
-            lastNameKey to it.lastName,
+            userKey to it.userModel,
             tokenKey to it.token,
         ) },
         restore = {
             AuthenticationStateData(
-                it[emailKey] as String,
-                it[usernameKey] as String,
-                it[firstNameKey] as String,
-                it[lastNameKey] as String,
+                it[userKey] as UserModel,
                 it[tokenKey] as String
             )
         }

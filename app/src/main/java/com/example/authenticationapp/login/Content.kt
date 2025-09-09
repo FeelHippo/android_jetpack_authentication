@@ -53,7 +53,9 @@ fun LoginContent(
     modifier: Modifier = Modifier,
 ) {
 
-    var email by rememberSaveable { mutableStateOf(uiState.email ?: "") }
+    val userModel = uiState.userModel
+
+    var email by rememberSaveable { mutableStateOf(userModel?.email ?: "") }
     var password by rememberSaveable { mutableStateOf("") }
 
     val title = stringResource(R.string.title_login)

@@ -29,19 +29,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.authenticationapp.R
+import com.example.authenticationapp.ui.state.AuthenticationStateData
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    uiState: AuthenticationStateData,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("Home Screen")
+        Text("Welcome ${uiState.userModel?.firstName ?: ""} ${uiState.userModel?.lastName ?: ""}")
     }
 }
 
 @Composable
 fun ProfileScreen(
+    uiState: AuthenticationStateData,
     revokeAuthentication: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -50,7 +55,7 @@ fun ProfileScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Profile Screen")
+            Text("Profile Screen for ${uiState.userModel?.email ?: ""}")
             Button(onClick = { revokeAuthentication() }) {
                 Text(stringResource(R.string.logout))
             }
@@ -59,12 +64,15 @@ fun ProfileScreen(
 }
 
 @Composable
-fun MapScreen(modifier: Modifier = Modifier) {
+fun MapScreen(
+    uiState: AuthenticationStateData,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("Map Screen")
+        Text("Map Screen ${uiState.userModel?.username ?: ""}")
     }
 }
 
@@ -80,6 +88,7 @@ enum class Destination(
 
 @Composable
 fun AppNavHost(
+    uiState: AuthenticationStateData,
     navController: NavHostController,
     startDestination: Destination,
     revokeAuthentication: () -> Unit,
@@ -92,9 +101,19 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.HOME -> HomeScreen(modifier)
-                    Destination.MAP -> MapScreen(modifier)
-                    Destination.PROFILE -> ProfileScreen(revokeAuthentication, modifier)
+                    Destination.HOME -> HomeScreen(
+                        uiState = uiState,
+                        modifier,
+                    )
+                    Destination.MAP -> MapScreen(
+                        uiState = uiState,
+                        modifier
+                    )
+                    Destination.PROFILE -> ProfileScreen(
+                        uiState = uiState,
+                        revokeAuthentication,
+                        modifier
+                    )
                 }
             }
         }
@@ -103,6 +122,7 @@ fun AppNavHost(
 
 @Composable
 fun HomeContent(
+    uiState: AuthenticationStateData,
     revokeAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -137,6 +157,7 @@ fun HomeContent(
         },
     ) { contentPadding  ->
         AppNavHost(
+            uiState = uiState,
             navController,
             startDestination,
             revokeAuthentication,

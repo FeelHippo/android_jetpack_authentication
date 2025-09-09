@@ -3,6 +3,7 @@ package com.example.authenticationapp.data.network.client
 import com.example.authenticationapp.data.network.requests.LoginRequest
 import com.example.authenticationapp.data.network.requests.RegistrationRequest
 import com.example.authenticationapp.data.network.responses.AuthenticationResponse
+import com.example.authenticationapp.data.network.responses.UserResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Query
@@ -15,5 +16,5 @@ interface ApiInterface {
     @POST("login/")
     suspend fun postLogin(@Body request: LoginRequest): Response<AuthenticationResponse>
     @GET("users/")
-    suspend fun getUserById(@Query("id") id: String): Response<Any>
+    suspend fun getUserById(@Query("id") id: String): Response<UserResponse>
 }

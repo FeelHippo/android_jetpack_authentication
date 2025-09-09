@@ -53,10 +53,12 @@ fun SignupContent(
     modifier: Modifier = Modifier,
 ) {
 
-    var email by rememberSaveable { mutableStateOf(uiState.email ?: "") }
-    var username by rememberSaveable { mutableStateOf(uiState.username ?: "") }
-    var firstName by rememberSaveable { mutableStateOf(uiState.firstName ?: "") }
-    var lastName by rememberSaveable { mutableStateOf(uiState.lastName ?: "") }
+    val userModel = uiState.userModel
+
+    var email by rememberSaveable { mutableStateOf(userModel?.email ?: "") }
+    var username by rememberSaveable { mutableStateOf(userModel?.username ?: "") }
+    var firstName by rememberSaveable { mutableStateOf(userModel?.firstName ?: "") }
+    var lastName by rememberSaveable { mutableStateOf(userModel?.lastName ?: "") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordRepeat by rememberSaveable { mutableStateOf("") }
 

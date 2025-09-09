@@ -16,8 +16,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AuthenticationAppTheme {
-                AuthenticationState() { state ->
-                    AuthenticationNavigation(state)
+                AuthenticationState() { state, updateState ->
+                    AuthenticationNavigation(
+                        state,
+                        updateState
+                    )
                 }
             }
         }

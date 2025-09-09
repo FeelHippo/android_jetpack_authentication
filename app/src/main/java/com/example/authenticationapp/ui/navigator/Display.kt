@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.example.authenticationapp.domain.AuthenticationRepository
+import com.example.authenticationapp.domain.models.UserModel
 import com.example.authenticationapp.home.HomeContent
 import com.example.authenticationapp.login.LoginContent
 import com.example.authenticationapp.service_locator.ServiceLocator
@@ -26,6 +27,7 @@ private data object HomeRoute
 @Composable
 fun AuthenticationNavigation(
     uiState:  AuthenticationStateData,
+    updateState: (UserModel) -> Unit
 ) {
     // https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/basic/BasicActivity.kt
     val entryRoute = if (uiState.token == null) LoginRoute else HomeRoute
@@ -50,14 +52,14 @@ fun AuthenticationNavigation(
                                     username,
                                     firstName,
                                     lastName,
-                                    Toast.makeText(context, "Could not create user :/", Toast.LENGTH_LONG),
-                                ) {
-                                    // UI related callback
-                                    uiState.email = email
-                                    uiState.username = username
-                                    uiState.firstName = firstName
-                                    uiState.lastName = lastName
-
+                                    Toast.makeText(
+                                        context, "Could not create user :/",
+                                        Toast.LENGTH_LONG
+                                    ),
+                                ) { userModel ->
+                                    // update UI
+                                    updateState(userModel)
+                                    // update navigator
                                     backStack.clear()
                                     backStack.add(HomeRoute)
                                 }
@@ -75,10 +77,10 @@ fun AuthenticationNavigation(
                                     email,
                                     password,
                                     Toast.makeText(context, "Could not create user :/", Toast.LENGTH_LONG),
-                                ) {
-                                    // UI related callback
-                                    uiState.email = email
-
+                                ) { userModel ->
+                                    // update UI
+                                    updateState(userModel)
+                                    // update navigator
                                     backStack.clear()
                                     backStack.add(HomeRoute)
                                 }
@@ -89,12 +91,10 @@ fun AuthenticationNavigation(
                 is PasswordRoute -> NavEntry(key) {}
                 is HomeRoute -> NavEntry(key) {
                     HomeContent(
+                        uiState = uiState,
                         revokeAuthentication = {
                             repository.logout {
-                                uiState.email = null
-                                uiState.username = null
-                                uiState.firstName = null
-                                uiState.lastName = null
+                                uiState.userModel = null
                                 uiState.token = null
                                 backStack.clear()
                                 backStack.add(LoginRoute)
